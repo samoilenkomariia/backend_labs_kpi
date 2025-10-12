@@ -1,4 +1,5 @@
 FROM python:3.11.3-slim-bullseye
+ENV PORT=5000
 WORKDIR /app
 COPY requirements.txt .
 RUN python -m pip install -r requirements.txt
