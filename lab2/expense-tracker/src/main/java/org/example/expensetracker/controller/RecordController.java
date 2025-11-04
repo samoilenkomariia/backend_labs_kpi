@@ -1,8 +1,9 @@
 package org.example.expensetracker.controller;
 
 import org.example.expensetracker.model.Record;
-import org.example.expensetracker.service.RecordService;
+import org.example.expensetracker.service.RecordService; // Changed import
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -12,45 +13,44 @@ import java.util.UUID;
 @RestController
 @RequestMapping("/record")
 public class RecordController {
-    private final RecordService service;
+
+    private final RecordService recordService;
 
     @Autowired
-    public RecordController(RecordService service) {
-        this.service = service;
+    public RecordController(RecordService recordService) {
+        this.recordService = recordService;
     }
 
     @GetMapping("/{recordId}")
-    public ResponseEntity<Record> getRecordById(@PathVariable UUID recordId) {
-        Record record = service.getRecordById(recordId);
-        if (record != null) {
-            return ResponseEntity.ok(record);
-        }
-        return  ResponseEntity.notFound().build();
+    public ResponseEntity<Record> getRecordById(
+            @PathVariable UUID recordId,
+            @RequestParam(name = "user_id") UUID userId
+    ) {
+        Record record = recordService.getRecordById(recordId, userId);
+        return ResponseEntity.ok(record);
     }
 
     @PostMapping
-    public Record createRecord(@RequestBody Record record) {
-        return service.createRecord(record);
+    public ResponseEntity<Record> createRecord(@RequestBody Record record) {
+        Record savedRecord = recordService.createRecord(record);
+        return ResponseEntity.status(HttpStatus.CREATED).body(savedRecord);
     }
 
     @DeleteMapping("/{recordId}")
-    public ResponseEntity<Record> deleteRecordById(@PathVariable UUID recordId) {
-        if (service.deleteRecord(recordId)) {
-            return ResponseEntity.noContent().build();
-        }
-        return ResponseEntity.notFound().build();
+    public ResponseEntity<Void> deleteRecordById(
+                                                  @PathVariable UUID recordId,
+                                                  @RequestParam(name = "user_id") UUID userId
+    ) {
+        recordService.deleteRecordById(recordId, userId);
+        return ResponseEntity.noContent().build();
     }
 
     @GetMapping
-    public ResponseEntity<?> getRecordByFilter(
-            @RequestParam(name="user_id", required=false) UUID userId,
-            @RequestParam(name="category_id", required=false) UUID categoryId
+    public ResponseEntity<List<Record>> getRecordsByFilter(
+                                                           @RequestParam(name="user_id", required = false) UUID userId,
+                                                           @RequestParam(name="category_id", required=false) UUID categoryId
     ) {
-        if (userId == null && categoryId == null) {
-            return ResponseEntity.badRequest()
-                    .body("Error: at least one query parameter is required");
-        }
-        List<Record> filteredRecords = service.findRecordByFilter(userId, categoryId);
+        List<Record> filteredRecords = recordService.getRecordsByFilter(userId, categoryId);
         return ResponseEntity.ok(filteredRecords);
     }
 }
