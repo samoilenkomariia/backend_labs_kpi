@@ -1,49 +1,66 @@
 package org.example.expensetracker.model;
 
-import org.springframework.stereotype.Component;
-
+import com.fasterxml.jackson.annotation.JsonProperty;
+import com.fasterxml.jackson.annotation.JsonProperty.Access;
+import jakarta.persistence.*;
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
 import java.util.Objects;
 import java.util.UUID;
 
-@Component
+@Entity
+@Table(name = "record")
 public class Record {
+    @Id
+    @GeneratedValue(strategy = GenerationType.AUTO)
+    @Column(name = "id", updatable = false, nullable = false)
     private UUID id;
-    private UUID userId;
-    private UUID categoryId;
+
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "user_id", nullable = false)
+    @JsonProperty(access = Access.WRITE_ONLY)
+    private User user;
+
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "category_id", nullable = false)
+    @JsonProperty(access = Access.WRITE_ONLY)
+    private Category category;
+
+    @Column(name = "amount", nullable = false, precision = 19, scale = 2)
     private BigDecimal amount;
-    private LocalDateTime createdAt;
+
+    @Column(name = "record_date", nullable = false)
+    private LocalDateTime recordDate;
 
     public Record() {}
 
-    public Record(UUID id, UUID userId, UUID categoryId, BigDecimal amount, LocalDateTime createdAt) {
+    public Record(UUID id, User user, Category category, BigDecimal amount, LocalDateTime recordDate) {
         this.id = id;
-        this.userId = userId;
-        this.categoryId = categoryId;
+        this.user = user;
+        this.category = category;
         this.amount = amount;
-        this.createdAt = createdAt;
+        this.recordDate = recordDate;
     }
 
     @Override
-    public boolean equals(Object o) {
-        if (!(o instanceof Record record)) return false;
-        return Objects.equals(getId(), record.getId()) && Objects.equals(getUserId(), record.getUserId()) && Objects.equals(getCategoryId(), record.getCategoryId()) && Objects.equals(getAmount(), record.getAmount()) && Objects.equals(getCreatedAt(), record.getCreatedAt());
+    public boolean equals(Object obj) {
+        if (this == obj) return true;
+        if (obj == null || getClass() != obj.getClass()) return false;
+        Record record = (Record) obj;
+        return Objects.equals(id, record.id);
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(getId(), getUserId(), getCategoryId(), getAmount(), getCreatedAt());
+        return Objects.hash(getId());
     }
 
     @Override
     public String toString() {
         return "Record{" +
-                "amount=" + amount +
-                ", createdAt=" + createdAt +
-                ", id=" + id +
-                ", categoryId=" + categoryId +
-                ", userId=" + userId +
+                "id=" + id +
+                ", amount=" + amount +
+                ", recordDate=" + recordDate +
                 '}';
     }
 
@@ -55,20 +72,20 @@ public class Record {
         return id;
     }
 
-    public UUID getUserId() {
-        return userId;
+    public User getUser() {
+        return user;
     }
 
-    public void setUserId(UUID userId) {
-        this.userId = userId;
+    public void setUser(User user) {
+        this.user = user;
     }
 
-    public UUID getCategoryId() {
-        return categoryId;
+    public Category getCategory() {
+        return category;
     }
 
-    public void setCategoryId(UUID categoryId) {
-        this.categoryId = categoryId;
+    public void setCategory(Category category) {
+        this.category = category;
     }
 
     public BigDecimal getAmount() {
@@ -79,11 +96,11 @@ public class Record {
         this.amount = amount;
     }
 
-    public LocalDateTime getCreatedAt() {
-        return createdAt;
+    public LocalDateTime getRecordDate() {
+        return recordDate;
     }
 
-    public void setCreatedAt(LocalDateTime createdAt) {
-        this.createdAt = createdAt;
+    public void setRecordDate(LocalDateTime recordDate) {
+        this.recordDate = recordDate;
     }
 }

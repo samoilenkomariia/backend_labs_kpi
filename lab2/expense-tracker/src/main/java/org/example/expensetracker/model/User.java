@@ -1,15 +1,28 @@
 package org.example.expensetracker.model;
 
-import org.springframework.stereotype.Component;
+import jakarta.persistence.*;
 
 import java.util.Objects;
+import java.util.Set;
 import java.util.UUID;
 
-@Component
+@Entity
+@Table(name = "users")
 public class User {
 
+    @Id
+    @GeneratedValue(strategy = GenerationType.AUTO)
+    @Column(name = "id", updatable = false, nullable = false)
     private UUID id;
+
+    @Column(name = "name", unique = true, nullable = false)
     private String name;
+
+    @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = true)
+    private Set<Category> categories;
+
+    @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = true)
+    private Set<Record> records;
 
     public User() {}
 
@@ -20,25 +33,20 @@ public class User {
 
     @Override
     public boolean equals(Object obj) {
-        if (this == obj) {
-            return false;
-        }
-        User user;
-        if (obj instanceof User) {
-            user = (User) obj;
-        } else return false;
-
-        return Objects.equals(this.id, user.id) && Objects.equals(this.name, user.name);
+        if (this == obj) { return false; }
+        if (obj == null || getClass() != obj.getClass()) { return false; }
+        User user = (User) obj;
+        return Objects.equals(getId(), user.getId());
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(getId(), getName());
+        return Objects.hash(getId());
     }
 
     @Override
     public String toString() {
-        return "User" + getId() + ": " + this.name;
+        return "User" + id + ": " + name;
     }
 
     public void setId(UUID id) {
@@ -55,5 +63,21 @@ public class User {
 
     public void setName(String name) {
         this.name = name;
+    }
+
+    public Set<Category> getCategories() {
+        return categories;
+    }
+
+    public void setCategories(Set<Category> categories) {
+        this.categories = categories;
+    }
+
+    public Set<Record> getRecords() {
+        return records;
+    }
+
+    public void setRecords(Set<Record> records) {
+        this.records = records;
     }
 }
