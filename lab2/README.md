@@ -4,5 +4,6 @@ for lab3+4 my variant is 2. Користувацькі категорії вит
 To run the code
 1. You need to have at least Java 17 installed, other dependencies are in [pom.xml](https://github.com/samoilenkomariia/backend_labs_kpi/blob/main/lab2/expense-tracker/pom.xml) file
 2. You need to create Spring Boot project with Maven build tool, see pom.xml for dependencies, paste code files and particular directories and on http://localhost:8080 you can check the app.
-3. Database is deployed on render.com until 5 December 2025. 
+3. Database is deployed on render.com until 5 December 2025.
+4. .gitignore is [here](https://github.com/samoilenkomariia/backend_labs_kpi/blob/main/lab2/expense-tracker/.gitignore)
 
